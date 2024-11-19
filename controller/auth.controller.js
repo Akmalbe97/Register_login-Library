@@ -1,9 +1,9 @@
-require("dotenv").config();
 const bcryptjs = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 const AuthSchema = require("../schemas/auth.schema");
-
+const {generateAccessToken, generateRefreshToken} = require("../utils/generate.token")
+require("dotenv").config();
 const register = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
@@ -67,20 +67,13 @@ const verify = async (req, res, next) => {
     }
 
     if (foundUser.verify_code === verify_code_client) {
-      await AuthSchema.findByIdAndUpdate(foundUser._id, { verify: true });
-
-      const token = jwt.sign(
-        { email: foundUser.email, role: foundUser.role, id: foundUser._id },
-        process.env.SECRET_KEY,
-        { expiresIn: process.env.JWT_TIME }
-      );
+      await AuthSchema.findByIdAndUpdate(foundUser._id, { verify: true, verify_code: "" });
 
       return res.status(200).json({
         message: "Successfully verified",
-        token,
       });
     } else {
-      return res.status(400).json({ message: "Verification code is incorrect" });
+      return res.status(400).json({ message: "Verification code is incorrect or not exsist" });
     }
   } catch (error) {
     next(error);
@@ -91,7 +84,7 @@ const login = async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const foundUser = await AuthSchema.findOne({ email });
+    const foundUser = await AuthSchema.findOne({ email: email });
     if (!foundUser) {
       return res.status(404).json({ message: "User not found" });
     }
@@ -101,21 +94,25 @@ const login = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid password" });
     }
 
-    if (!foundUser.verify) {
-      return res.status(403).json({ message: "You are not verified" });
+    if (foundUser.verify === true) {
+      
+      const accessToken = generateAccessToken({id: foundUser._id, role: foundUser.role, email: foundUser.email})
+
+      const refreshToken = generateRefreshToken({id: foundUser._id, email: foundUser.email, role: foundUser.role})
+      
+      res.cookie("accessToken", accessToken, {httpOnly: true, maxAgs: process.env.COOKIE_ACCESS_TIME})
+      res.cookie("refreshToken", refreshToken, {httpOnly: true, maxAgs: process.env.COOKIE_REFRESH_TIME})
+    
+      res.status(200).json({
+        message: "Login successful",
+        tokens: {
+          accessToken
+        }
+      });
+    }else {
+        return res.status(403).json({ message: "You are not verified" });
     }
-
-    const token = jwt.sign(
-      { email: foundUser.email, role: foundUser.role, id: foundUser._id },
-      process.env.SECRET_KEY,
-      { expiresIn: process.env.JWT_TIME }
-    );
-
-    return res.status(200).json({
-      message: "Login successful",
-      token,
-    });
-  } catch (error) {
+    } catch (error) {
     next(error);
   }
 };
