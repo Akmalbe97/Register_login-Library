@@ -20,7 +20,7 @@ const authorSchemas = new Schema(
       minlength: 2,
       maxlength:4
     },
-    day_of_death: {
+    date_of_death: {
       type: Number,
       required: true,
       minlength: 2,
