@@ -103,7 +103,7 @@ const login = async (req, res, next) => {
       res.cookie("accessToken", accessToken, {httpOnly: true, maxAgs: process.env.COOKIE_ACCESS_TIME})
       res.cookie("refreshToken", refreshToken, {httpOnly: true, maxAgs: process.env.COOKIE_REFRESH_TIME})
     
-      res.status(200).json({
+      return res.status(200).json({
         message: "Login successful",
         tokens: {
           accessToken
