@@ -14,7 +14,7 @@ const authorRouter = Router();
 
 authorRouter.get("/get_authors", getAuthors);
 authorRouter.get("/get_one_author/:id",  getOneAuthors);
-authorRouter.post("/add_author", [verifyRefreshToken, authorValidate, checkAdmin], addAuthor);
+authorRouter.post("/add_author", [authorValidate, checkAdmin], addAuthor);
 authorRouter.post("/add_image", uploadImage.single("image", uploadImage))
 authorRouter.put("/update_author/:id", [authorValidate, checkAdmin], updateAuthor);
 authorRouter.delete("/delete_author/:id", checkAdmin, deleteAuthor);

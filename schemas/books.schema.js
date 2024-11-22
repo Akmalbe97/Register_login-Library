@@ -25,7 +25,7 @@ const bookSchemas = new Schema(
     publish: {
       type: String,
       required: true,
-      minlength: [30, "30 Harfdan ko'proq kiriting!"],
+      minlength: [5, "5 Harfdan ko'proq kiriting!"],
     },
     genre: {
       type: String,
@@ -49,7 +49,7 @@ const bookSchemas = new Schema(
     description: {
       type: String,
       required: true,
-      minlength: [100, "Kitob haqida ko'proq ma'lumot kiriting!"],
+      minlength: [10, "Kitob haqida ko'proq ma'lumot kiriting!"],
     },
     author_info: {
       type: Schema.Types.ObjectId,

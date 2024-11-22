@@ -17,14 +17,10 @@ const authorSchemas = new Schema(
     date_of_birth: {
       type: Number,
       required: true,
-      minlength: 2,
-      maxlength:4
     },
     date_of_death: {
       type: Number,
       required: true,
-      minlength: 2,
-      maxlength:4
     },
     country: {
       type: String,

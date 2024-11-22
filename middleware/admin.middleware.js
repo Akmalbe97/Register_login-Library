@@ -10,7 +10,7 @@ const checkAdmin = async (req, res, next) => {
     });
   }
   try {
-    const decoded = jwt.verify(token, process.env.SECRET_KEY);
+    const decoded = jwt.verify(token, process.env.ACCESS_SECRET_KEY);
     req.email = decoded;
 
     if (req.email.role !== "admin") {
